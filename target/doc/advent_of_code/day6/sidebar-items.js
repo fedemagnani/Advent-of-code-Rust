@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["part1",""],["part2",""]]});
