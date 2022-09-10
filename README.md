@@ -5,6 +5,8 @@ Working on Advent of code challenges 2020.
 
 "Link advent of code: https://adventofcode.com/ (append the year, starting from 2015). Solutions in rust (from 2020): https://github.com/lmammino/rust-advent/tree/main/"
 
+If formatter on autoSave is enabled and the autosave is not working, run `cargo fmt` and check what is wrong: if you fix it the formatter should work again
+
 You can use for loops just with ***iterators***
 Common methods for iterator:
 - ***.collect()***: convert an iterator into a collection

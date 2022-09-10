@@ -1,79 +1,151 @@
---- Day 8: Handheld Halting ---
-Your flight to the major airline hub reaches cruising altitude without incident. While you consider checking the in-flight menu for one of those drinks that come with a little umbrella, you are interrupted by the kid sitting next to you.
+## \--- Day 10: Adapter Array ---
 
-Their handheld game console won't turn on! They ask if you can take a look.
+Patched into the aircraft's data port, you discover weather forecasts of a massive tropical storm. Before you can figure out whether it will impact your vacation plans, however, your device suddenly turns off!
 
-You narrow the problem down to a strange infinite loop in the boot code (your puzzle input) of the device. You should be able to fix it, but first you need to be able to run the code in isolation.
+Its battery is dead.
 
-The boot code is represented as a text file with one instruction per line of text. Each instruction consists of an operation (acc, jmp, or nop) and an argument (a signed number like +4 or -20).
+You'll need to plug it in. There's only one problem: the charging outlet near your seat produces the wrong number of _jolts_. Always prepared, you make a list of all of the joltage adapters in your bag.
 
-acc increases or decreases a single global value called the accumulator by the value given in the argument. For example, acc +7 would increase the accumulator by 7. The accumulator starts at 0. After an acc instruction, the instruction immediately below it is executed next.
-jmp jumps to a new instruction relative to itself. The next instruction to execute is found using the argument as an offset from the jmp instruction; for example, jmp +2 would skip the next instruction, jmp +1 would continue to the instruction immediately below it, and jmp -20 would cause the instruction 20 lines above to be executed next.
-nop stands for No OPeration - it does nothing. The instruction immediately below it is executed next.
-For example, consider the following program:
+Each of your joltage adapters is rated for a specific _output joltage_ (your puzzle input). Any given adapter can take an input `1`, `2`, or `3` jolts _lower_ than its rating and still produce its rated output joltage.
 
-nop +0
-acc +1
-jmp +4
-acc +3
-jmp -3
-acc -99
-acc +1
-jmp -4
-acc +6
-These instructions are visited in this order:
+In addition, your device has a built-in joltage adapter rated for _`3` jolts higher_ than the highest-rated adapter in your bag. (If your adapter list were `3`, `9`, and `6`, your device's built-in adapter would be rated for `12` jolts.)
 
-nop +0  | 1
-acc +1  | 2, 8(!)
-jmp +4  | 3
-acc +3  | 6
-jmp -3  | 7
-acc -99 |
-acc +1  | 4
-jmp -4  | 5
-acc +6  |
-First, the nop +0 does nothing. Then, the accumulator is increased from 0 to 1 (acc +1) and jmp +4 sets the next instruction to the other acc +1 near the bottom. After it increases the accumulator from 1 to 2, jmp -4 executes, setting the next instruction to the only acc +3. It sets the accumulator to 5, and jmp -3 causes the program to continue back at the first acc +1.
+Treat the charging outlet near your seat as having an effective joltage rating of `0`.
 
-This is an infinite loop: with this sequence of jumps, the program will run forever. The moment the program tries to run any instruction a second time, you know it will never terminate.
+Since you have some time to kill, you might as well test all of your adapters. Wouldn't want to get to your resort and realize you can't even charge your device!
 
-Immediately before the program would run an instruction a second time, the value in the accumulator is 5.
+If you _use every adapter in your bag_ at once, what is the distribution of joltage differences between the charging outlet, the adapters, and your device?
 
-Run your copy of the boot code. Immediately before any instruction is executed a second time, what value is in the accumulator?
+For example, suppose that in your bag, you have adapters with the following joltage ratings:
 
-To begin, get your puzzle input.
+    16
+    10
+    15
+    5
+    1
+    11
+    7
+    19
+    6
+    12
+    4
 
+With these adapters, your device's built-in joltage adapter would be rated for `19 + 3 = _22_` jolts, 3 higher than the highest-rated adapter.
 
---- Part Two ---
-After some careful analysis, you believe that exactly one instruction is corrupted.
+Because adapters can only connect to a source 1-3 jolts lower than its rating, in order to use every adapter, you'd need to choose them like this:
 
-Somewhere in the program, either a jmp is supposed to be a nop, or a nop is supposed to be a jmp. (No acc instructions were harmed in the corruption of this boot code.)
+- The charging outlet has an effective rating of `0` jolts, so the only adapters that could connect to it directly would need to have a joltage rating of `1`, `2`, or `3` jolts. Of these, only one you have is an adapter rated `1` jolt (difference of _`1`_).
+- From your `1`\-jolt rated adapter, the only choice is your `4`\-jolt rated adapter (difference of _`3`_).
+- From the `4`\-jolt rated adapter, the adapters rated `5`, `6`, or `7` are valid choices. However, in order to not skip any adapters, you have to pick the adapter rated `5` jolts (difference of _`1`_).
+- Similarly, the next choices would need to be the adapter rated `6` and then the adapter rated `7` (with difference of _`1`_ and _`1`_).
+- The only adapter that works with the `7`\-jolt rated adapter is the one rated `10` jolts (difference of _`3`_).
+- From `10`, the choices are `11` or `12`; choose `11` (difference of _`1`_) and then `12` (difference of _`1`_).
+- After `12`, only valid adapter has a rating of `15` (difference of _`3`_), then `16` (difference of _`1`_), then `19` (difference of _`3`_).
+- Finally, your device's built-in adapter is always 3 higher than the highest adapter, so its rating is `22` jolts (always a difference of _`3`_).
 
-The program is supposed to terminate by attempting to execute an instruction immediately after the last instruction in the file. By changing exactly one jmp or nop, you can repair the boot code and make it terminate correctly.
+In this example, when using every adapter, there are _`7`_ differences of 1 jolt and _`5`_ differences of 3 jolts.
 
-For example, consider the same program from above:
+Here is a larger example:
 
-nop +0
-acc +1
-jmp +4
-acc +3
-jmp -3
-acc -99
-acc +1
-jmp -4
-acc +6
-If you change the first instruction from nop +0 to jmp +0, it would create a single-instruction infinite loop, never leaving that instruction. If you change almost any of the jmp instructions, the program will still eventually find another jmp instruction and loop forever.
+    28
+    33
+    18
+    42
+    31
+    14
+    46
+    20
+    48
+    47
+    24
+    23
+    49
+    45
+    19
+    38
+    39
+    11
+    1
+    32
+    25
+    35
+    8
+    17
+    7
+    9
+    4
+    2
+    34
+    10
+    3
 
-However, if you change the second-to-last instruction (from jmp -4 to nop -4), the program terminates! The instructions are visited in this order:
+In this larger example, in a chain that uses all of the adapters, there are _`22`_ differences of 1 jolt and _`10`_ differences of 3 jolts.
 
-nop +0  | 1
-acc +1  | 2
-jmp +4  | 3
-acc +3  |
-jmp -3  |
-acc -99 |
-acc +1  | 4
-nop -4  | 5
-acc +6  | 6
-After the last instruction (acc +6), the program terminates by attempting to run the instruction below the last instruction in the file. With this change, after the program terminates, the accumulator contains the value 8 (acc +1, acc +1, acc +6).
+Find a chain that uses all of your adapters to connect the charging outlet to your device's built-in adapter and count the joltage differences between the charging outlet, the adapters, and your device. _What is the number of 1-jolt differences multiplied by the number of 3-jolt differences?_
 
-Fix the program so that it terminates normally by changing exactly one jmp (to nop) or nop (to jmp). What is the value of the accumulator after the program terminates?
+Your puzzle answer was `2380`.
+
+## \--- Part Two ---
+
+To completely determine whether you have enough adapters, you'll need to figure out how many different ways they can be arranged. Every arrangement needs to connect the charging outlet to your device. The previous rules about when adapters can successfully connect still apply.
+
+The first example above (the one that starts with `16`, `10`, `15`) supports the following arrangements:
+
+    (0), 1, 4, 5, 6, 7, 10, 11, 12, 15, 16, 19, (22)
+    (0), 1, 4, 5, 6, 7, 10, 12, 15, 16, 19, (22)
+    (0), 1, 4, 5, 7, 10, 11, 12, 15, 16, 19, (22)
+    (0), 1, 4, 5, 7, 10, 12, 15, 16, 19, (22)
+    (0), 1, 4, 6, 7, 10, 11, 12, 15, 16, 19, (22)
+    (0), 1, 4, 6, 7, 10, 12, 15, 16, 19, (22)
+    (0), 1, 4, 7, 10, 11, 12, 15, 16, 19, (22)
+    (0), 1, 4, 7, 10, 12, 15, 16, 19, (22)
+
+(The charging outlet and your device's built-in adapter are shown in parentheses.) Given the adapters from the first example, the total number of arrangements that connect the charging outlet to your device is _`8`_.
+
+The second example above (the one that starts with `28`, `33`, `18`) has many arrangements. Here are a few:
+
+    (0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31,
+    32, 33, 34, 35, 38, 39, 42, 45, 46, 47, 48, 49, (52)
+
+    (0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31,
+    32, 33, 34, 35, 38, 39, 42, 45, 46, 47, 49, (52)
+
+    (0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31,
+    32, 33, 34, 35, 38, 39, 42, 45, 46, 48, 49, (52)
+
+    (0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31,
+    32, 33, 34, 35, 38, 39, 42, 45, 46, 49, (52)
+
+    (0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31,
+    32, 33, 34, 35, 38, 39, 42, 45, 47, 48, 49, (52)
+
+    (0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45,
+    46, 48, 49, (52)
+
+    (0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45,
+    46, 49, (52)
+
+    (0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45,
+    47, 48, 49, (52)
+
+    (0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45,
+    47, 49, (52)
+
+    (0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45,
+    48, 49, (52)
+
+In total, this set of adapters can connect the charging outlet to your device in _`19208`_ distinct arrangements.
+
+You glance back down at your bag and try to remember why you brought so many adapters; there must be _more than a trillion_ valid ways to arrange them! Surely, there must be an efficient way to count the arrangements.
+
+_What is the total number of distinct ways you can arrange the adapters to connect the charging outlet to your device?_
+
+Your puzzle answer was `48358655787008`.
+
+Both parts of this puzzle are complete! They provide two gold stars: \*\*
+
+At this point, you should [return to your Advent calendar](/2020) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](10/input).
+
+You can also \[Shareon [Twitter](https://twitter.com/intent/tweet?text=I%27ve+completed+%22Adapter+Array%22+%2D+Day+10+%2D+Advent+of+Code+2020&url=https%3A%2F%2Fadventofcode%2Ecom%2F2020%2Fday%2F10&related=ericwastl&hashtags=AdventOfCode) [Mastodon](<javascript:void(0);>)\] this puzzle.
